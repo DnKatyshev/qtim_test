@@ -100,13 +100,14 @@ export class ArticleService {
 
   // Метод используется, например, после обновления/удаления статьи
   private async invalidateCache(articleId?: number) {
-    const redisClient = (this.cacheManager.stores as any).client;
-
-    const keys = await redisClient.keys('articles:*');
-    if (keys.length) await redisClient.del(...keys);
-
+    // Удаляем все известные ключи по одному
+    const keys = ['articles:*'];
+    for (const key of keys) {
+      await this.cacheManager.del(key);
+    }
+    
     if (articleId) {
-      await redisClient.del(`article:${articleId}`);
+      await this.cacheManager.del(`article:${articleId}`);
     }
   }
 

@@ -14,6 +14,9 @@ async function bootstrap() {
   
     await articleRepo.clear();
     await userRepo.clear();
+    
+    await dataSource.query(`ALTER SEQUENCE article_id_seq RESTART WITH 1`);
+    await dataSource.query(`ALTER SEQUENCE user_id_seq RESTART WITH 1`);    
   
     const hashedPassword = await bcrypt.hash('password123', 10);
     const user = userRepo.create({

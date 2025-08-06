@@ -25,14 +25,13 @@ import { redisStore } from 'cache-manager-ioredis-yet';
     }),
     CacheModule.registerAsync({
       isGlobal: true,
-      useFactory: async () => ({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
         store: await redisStore({
-          socket: {
-            host: 'localhost',
-            port: 6379,
-          },
+          url: config.get<string>('REDIS_URL'),
         }),
-        ttl: 60 * 5, // 5 минут
+        ttl: 60 * 5,
       }),
     }),
     TypeOrmModule.forFeature([User, Article]),

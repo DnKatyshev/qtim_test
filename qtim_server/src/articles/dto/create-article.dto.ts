@@ -9,4 +9,7 @@ export class CreateArticleDto {
 
   @IsString()
   author: string;
+
+  @IsString()
+  publishedAt: Date;
 }
