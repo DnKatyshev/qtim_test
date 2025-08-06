@@ -1,0 +1,64 @@
+services:
+  backend:
+    build:
+      context: ./qtim_server
+      dockerfile: Dockerfile
+    command: npm run start:dev
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./qtim_server:/app
+    environment:
+      - DATABASE_URL=postgresql://danila:qtim_password@db:5432/qtim_db
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=secret_key
+      - JWT_REFRESH_SECRET=refresh_secret_key
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: danila
+      POSTGRES_PASSWORD: qtim_password
+      POSTGRES_DB: qtim_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5051:80"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
